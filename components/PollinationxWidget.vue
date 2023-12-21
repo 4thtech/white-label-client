@@ -21,7 +21,6 @@ const { getNfts, nftStore, mintFreePxNft, mintPxNft, pxXNfts, pxNftPackages, upg
 const packageModalOpen = useState<boolean>('is-modal-active', () => false);
 const upgradeNft = useState<string>();
 const mainSelectedNft = useState<any>();
-nftStore.nftsRes = pxXNfts.value;
 
 
 const mintFreeNft = async () => {
@@ -92,17 +91,19 @@ const upgradeMintNft = async (nftPackage) => {
 
 };
 const connectStorageNft = async () => {
-  nftStore.nftsRes = await getNfts().catch((error) => toast.error(error.message));
-  if (!nftStore.nftsRes?.error) {
-    nftStore.nftsRes.nfts[0].isDefault = true;
-    initializeMailClient(nftStore.nftsRes.nfts[0].endpoint,nftStore.nftsRes.nfts[0].jwt)
+  pxXNfts.value = await getNfts().catch((error) => toast.error(error.message));
+  console.log("pxXNfts.value")
+  console.log(pxXNfts.value)
+  if (!pxXNfts.value?.error) {
+    pxXNfts.value.nfts[0].isDefault = true;
+    initializeMailClient(pxXNfts.value.nfts[0].endpoint,pxXNfts.value.nfts[0].jwt)
   }
   else{
-    toast.error(nftStore.nftsRes.error)
+    toast.error(pxXNfts.value.error)
   }
 };
 const setDefault = async (nft) => {
-  nftStore.nftsRes.nfts.forEach(item => {
+  pxXNfts.value.nfts.forEach(item => {
     item.isDefault = false;
   });
   nft.isDefault = true;
@@ -119,7 +120,7 @@ const closeModal = () => {
 
 const pollinationxWidget = computed(() => {
   console.log('computed pollinationxWidget')
-  if(nftStore.nftsRes.success && nftStore.nftsRes.nfts.length == 0){
+  if(pxXNfts.value.success && pxXNfts.value.nfts?.length == 0){
 
     return {
       title: 'PollinationX Storage On-Demand',
@@ -131,7 +132,7 @@ const pollinationxWidget = computed(() => {
       },
     };
   }
-  else if(!nftStore.nftsRes.success){
+  else if(!pxXNfts.value.success){
     return {
       title: 'PollinationX Storage On-Demand',
       text: '',
@@ -207,13 +208,13 @@ const pollinationxModalInfo = computed(() => {
           <span>{{ pollinationxWidget.button.text }}</span>
         </BaseButton>
       </div>
-      <div v-if="nftStore.nftsRes && nftStore.nftsRes.nfts" class="mt-4 text-center">
-        <BaseParagraph size="xs" v-if="nftStore.nftsRes.nfts.length > 0">
+      <div v-if="pxXNfts && pxXNfts.nfts" class="mt-4 text-center">
+        <BaseParagraph size="xs" v-if="pxXNfts.nfts.length > 0">
           <span class="text-muted-400">Click to select default PX storage dNFT ↓</span>
         </BaseParagraph>
         <ul class="nft-list mt-2">
           <li
-            v-for="nft in nftStore.nftsRes.nfts"
+            v-for="nft in pxXNfts.nfts"
             :key="nft.id"
             @click="setDefault(nft)"
             :class="{ 'default-selection': nft.isDefault }"
@@ -259,14 +260,14 @@ const pollinationxModalInfo = computed(() => {
           <img width="25" src="/img/logos/pxIcon.svg" :class="{ 'logoPackages': nftPackage.processing, 'mx-auto': true, 'mb-2': true }"/>
           <div class="package-details">
             <p class="text-sm">Size: {{ nftPackage.size }} GB</p>
-            <p class="text-sm">Price: {{ nftPackage.price }} {{ nftStore.nftsRes.symbol }}</p>
+            <p class="text-sm">Price: {{ nftPackage.price }} {{ pxXNfts.symbol }}</p>
           </div>
         </div>
         <div v-else :class="{ 'disabled': nftPackage.disabled }"  @click="!nftPackage.disabled && mintNft(nftPackage)">
           <img width="25" src="/img/logos/pxIcon.svg" :class="{ 'logoPackages': nftPackage.processing, 'mx-auto': true, 'mb-2': true }"/>
           <div class="package-details">
             <p class="text-sm">Size: {{ nftPackage.size }} GB</p>
-            <p class="text-sm">Price: {{ nftPackage.price }} {{ nftStore.nftsRes.symbol }}</p>
+            <p class="text-sm">Price: {{ nftPackage.price }} {{ pxXNfts.symbol }}</p>
           </div>
         </div>
       </div>

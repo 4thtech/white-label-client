@@ -10,9 +10,7 @@ export function usePollinationX() {
     url: string
     authMessage: string
   }
-  interface NftStore {
-    nftsRes: IGetNft | string | number | null;
-  }
+
    const pollinationXConfig: IPollinationXConfig = {
      url: 'https://6cp0k0.pollinationx.io',
      authMessage:  'This request will check your PollinationX storage NFT and it will not trigger a blockchain transaction or cost any gas fees.',
@@ -100,10 +98,6 @@ export function usePollinationX() {
 
   const { address } = useAccount();
 
-  const nftStore: NftStore = reactive({
-    nftsRes: null,
-  })
-
   const pxXNfts = useState<IGetNft>();
   interface INftPackage {
     id: number
@@ -129,10 +123,9 @@ export function usePollinationX() {
   };
 
   const resetPxNfts = () => {
-    nftStore.nftsRes = null;
     return pxXNfts.value = defaultNftState;
   }
-  const getNfts = async (): Promise<IGetNft> => {
+  const getNfts = async () => {
     try {
       const { chain, nonce, signature } = await doSignMessage(pollinationXConfig.authMessage)
       const response = await httpClient.get('/auth/login', {
@@ -228,7 +221,6 @@ export function usePollinationX() {
     mintFreePxNft,
     mintPxNft,
     getNfts,
-    nftStore,
     pxXNfts,
     pxNftPackages,
     upgradePxNftPackage,
