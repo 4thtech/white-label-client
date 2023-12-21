@@ -17,7 +17,7 @@ defineProps<{
 
 const toast = useToast();
 const { initializeMailClient } = useMail();
-const { getNfts, nftStore, mintFreePxNft, mintPxNft, pxXNfts, pxNftPackages, upgradePxNftPackage } = usePollinationX();
+const { getNfts, mintFreePxNft, mintPxNft, pxXNfts, pxNftPackages, upgradePxNftPackage } = usePollinationX();
 const packageModalOpen = useState<boolean>('is-modal-active', () => false);
 const upgradeNft = useState<string>();
 const mainSelectedNft = useState<any>();
@@ -92,8 +92,6 @@ const upgradeMintNft = async (nftPackage) => {
 };
 const connectStorageNft = async () => {
   pxXNfts.value = await getNfts().catch((error) => toast.error(error.message));
-  console.log("pxXNfts.value")
-  console.log(pxXNfts.value)
   if (!pxXNfts.value?.error) {
     pxXNfts.value.nfts[0].isDefault = true;
     initializeMailClient(pxXNfts.value.nfts[0].endpoint,pxXNfts.value.nfts[0].jwt)
@@ -119,8 +117,7 @@ const closeModal = () => {
 };
 
 const pollinationxWidget = computed(() => {
-  console.log('computed pollinationxWidget')
-  if(pxXNfts.value.success && pxXNfts.value.nfts?.length == 0){
+  if(pxXNfts.value?.success && pxXNfts.value.nfts?.length == 0){
 
     return {
       title: 'PollinationX Storage On-Demand',
@@ -132,7 +129,7 @@ const pollinationxWidget = computed(() => {
       },
     };
   }
-  else if(!pxXNfts.value.success){
+  else if(!pxXNfts.value?.success){
     return {
       title: 'PollinationX Storage On-Demand',
       text: '',
