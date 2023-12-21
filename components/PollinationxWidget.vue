@@ -118,7 +118,7 @@ const closeModal = () => {
 };
 
 const pollinationxWidget = computed(() => {
-
+  console.log('computed pollinationxWidget')
   if(nftStore.nftsRes.success && nftStore.nftsRes.nfts.length == 0){
 
     return {
