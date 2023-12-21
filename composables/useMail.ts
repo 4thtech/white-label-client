@@ -14,8 +14,8 @@ export function useMail() {
   const receivedEnvelopes = useState<ReceivedEnvelope[]>('received-envelopes', () => []);
   const unwatchOnNew = useState<Function>('unwatch-on-new');
 
-  const initializeRemoteStorageProvider = () => {
-    return new PollinationX(runtimeConfig.public.pollinationX.url, runtimeConfig.public.pollinationX.token);
+  const initializeRemoteStorageProvider = (url?: string, token?: string) => {
+    return new PollinationX(url || runtimeConfig.public.pollinationX.url, token || runtimeConfig.public.pollinationX.token);
   };
 
   const initializeEncryptionHandler = () => {
@@ -26,14 +26,14 @@ export function useMail() {
     });
   };
 
-  const initializeMailClient = () => {
+  const initializeMailClient = (url?: string, token?: string) => {
     const { walletClient } = useWallet();
 
     if (!walletClient.chain?.contracts?.mail) {
       return;
     }
 
-    const remoteStorageProvider = initializeRemoteStorageProvider();
+    const remoteStorageProvider = initializeRemoteStorageProvider(url, token);
     const encryptionHandler = initializeEncryptionHandler();
 
     mailClient.value = new Mail({

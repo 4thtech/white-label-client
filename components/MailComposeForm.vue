@@ -15,6 +15,7 @@ const emits = defineEmits<{
 }>();
 
 const { encryptorClient, isReadyToUse: isEncryptorReadyToUse } = useEncryptor();
+const { pxXNfts } = usePollinationX();
 const { mailClient } = useMail();
 const route = useRoute();
 const toast = useToast();
@@ -116,6 +117,7 @@ const prepareContent = (action: 'reply' | 'forward', envelope: ReceivedEnvelope)
 };
 
 const isEncryptorWidgetVisible = computed(() => canUseEncryption.value && !isEncryptorReadyToUse.value);
+const isPollinationXReady = computed(() => pxXNfts.value.success && pxXNfts.value?.nfts?.length > 0);
 
 onMounted(() => {
   const queryType = route.query.reply ? 'reply' : route.query.forward ? 'forward' : undefined;
@@ -164,8 +166,9 @@ onBeforeRouteLeave(() => {
       </div>
       <!-- Encryptor widget -->
       <EncryptorWidget v-if="isEncryptorWidgetVisible" color="none" />
+      <PollinationxWidget v-if="!isPollinationXReady"  color="none" />
       <!-- Form -->
-      <div v-show="!isEncryptorWidgetVisible">
+      <div v-show="!isEncryptorWidgetVisible && isPollinationXReady">
         <div class="px-10 py-5">
           <div class="grid grid-cols-12 gap-4">
             <div class="col-span-12">
