@@ -78,7 +78,7 @@ const upgradeMintNft = async (nftPackage) => {
     item.disabled = true;
   });
   nftPackage.processing = true;
-  toast.info("Upgrading PX storage dNFT in progress")
+  toast.info("Upgrading PX sNFT in progress")
   const res = await upgradePxNftPackage(mainSelectedNft.value.id.tokenId, nftPackage.id, nftPackage.price).catch((error) => toast.error(error.message));
   if (!res?.error) {
     toast.success("Upgraded")
@@ -123,7 +123,7 @@ const pollinationxWidget = computed(() => {
       title: 'PollinationX Storage On-Demand',
       text: 'Connected',
       button: {
-        text: 'Mint your FREE 100MB PX storage dNFT',
+        text: 'Mint your FREE 100MB PX sNFT',
         mintFree: true,
         click: () => mintFreeNft(),
       },
@@ -135,7 +135,7 @@ const pollinationxWidget = computed(() => {
       text: '',
       button: {
         mintFree: false,
-        text: 'Connect storage PX dNFT',
+        text: 'Connect PX sNFTs',
         click: () => connectStorageNft(),
       },
     };
@@ -146,7 +146,7 @@ const pollinationxWidget = computed(() => {
       text: 'Connected',
       button: {
         mintFree: false,
-        text: 'Buy new PX storage dNFT',
+        text: 'Buy new PX sNFT',
         click: () => mintNftModal(),
       },
     };
@@ -157,13 +157,13 @@ const pollinationxModalInfo = computed(() => {
 
   if(upgradeNft.value){
     return {
-      title: 'Upgrade existing PX storage dNFT',
+      title: 'Upgrade existing PX sNFT',
       upgrade: true
     };
   }
  else{
     return {
-      title: 'Mint new PX storage dNFT',
+      title: 'Mint new PX sNFT',
       upgrade: false
     };
   }
@@ -207,7 +207,7 @@ const pollinationxModalInfo = computed(() => {
       </div>
       <div v-if="pxXNfts && pxXNfts.nfts" class="mt-4 text-center">
         <BaseParagraph size="xs" v-if="pxXNfts.nfts.length > 0">
-          <span class="text-muted-400">Click to select default PX storage dNFT ↓</span>
+          <span class="text-muted-400">Click to select default PX sNFT ↓</span>
         </BaseParagraph>
         <ul class="nft-list mt-2">
           <li
