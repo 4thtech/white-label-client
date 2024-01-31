@@ -2,10 +2,12 @@
 definePageMeta({
   title: 'Dashboard',
 });
+
+const { isNftIntegrationEnabled } = usePollinationX();
 </script>
 
 <template>
-  <div class="grid gap-6 sm:grid-cols-3 ptablet:grid-cols-2 mb-7">
+  <div class="mb-7 grid gap-6 sm:grid-cols-3 ptablet:grid-cols-2">
     <!-- Account widget -->
     <div class="relative">
       <AccountDataWidget />
@@ -15,7 +17,7 @@ definePageMeta({
       <EncryptorWidget />
     </div>
     <!-- PollinationX widget -->
-    <div class="relative">
+    <div v-if="isNftIntegrationEnabled" class="relative">
       <PollinationxWidget />
     </div>
   </div>

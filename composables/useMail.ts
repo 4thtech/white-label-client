@@ -1,12 +1,11 @@
 import type { ReceivedEnvelope } from '@4thtech-sdk/types';
 import { Mail } from '@4thtech-sdk/ethereum';
-import { PollinationX } from '@4thtech-sdk/storage';
 import { EncryptionHandler } from '@4thtech-sdk/encryption';
 import { useToast } from 'vue-toastification';
 
 export function useMail() {
   const { address } = useAccount();
-  const runtimeConfig = useRuntimeConfig();
+  const { pollinationXClient } = usePollinationX();
   const toast = useToast();
 
   const mailClient = useState<Mail>('mail-client');
@@ -14,8 +13,8 @@ export function useMail() {
   const receivedEnvelopes = useState<ReceivedEnvelope[]>('received-envelopes', () => []);
   const unwatchOnNew = useState<Function>('unwatch-on-new');
 
-  const initializeRemoteStorageProvider = (url?: string, token?: string) => {
-    return new PollinationX(url || runtimeConfig.public.pollinationX.url, token || runtimeConfig.public.pollinationX.token);
+  const initializeRemoteStorageProvider = () => {
+    return pollinationXClient.value;
   };
 
   const initializeEncryptionHandler = () => {
@@ -26,14 +25,14 @@ export function useMail() {
     });
   };
 
-  const initializeMailClient = (url?: string, token?: string) => {
+  const initializeMailClient = () => {
     const { walletClient } = useWallet();
 
     if (!walletClient.chain?.contracts?.mail) {
       return;
     }
 
-    const remoteStorageProvider = initializeRemoteStorageProvider(url, token);
+    const remoteStorageProvider = initializeRemoteStorageProvider();
     const encryptionHandler = initializeEncryptionHandler();
 
     mailClient.value = new Mail({

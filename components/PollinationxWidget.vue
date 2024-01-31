@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useToast } from 'vue-toastification';
+import type { Nft, NftPackage } from '~/types/pollination-x';
 
 defineProps<{
   color?:
@@ -15,160 +15,94 @@ defineProps<{
     | 'none';
 }>();
 
-const toast = useToast();
-const { initializeMailClient } = useMail();
-const { getNfts, mintFreePxNft, mintPxNft, pxXNfts, pxNftPackages, upgradePxNftPackage } = usePollinationX();
-const packageModalOpen = useState<boolean>('is-modal-active', () => false);
-const upgradeNft = useState<string>();
-const mainSelectedNft = useState<any>();
+const { pxNfts, pxNftPackages, primaryNft, connectStorageNft, mintNft, setPrimaryNft, upgradeNft } = usePollinationX();
 
+const nftPackagesModalOpen = ref(false);
+const selectedNftForUpgrade = ref<Nft>();
+const processingNftPackageIds = ref<Set<number>>(new Set());
 
-const mintFreeNft = async () => {
-  toast.info("Minting in progress")
-  const res = await mintFreePxNft().catch((error) => toast.error(error.message));
-  if (!res?.error) {
-    toast.success("Minted")
-    await connectStorageNft();
-  }
-  else{
-    toast.error(res.error.message)
-  }
-};
-const mintNftModal = async () => {
-  upgradeNft.value = "";
-  mainSelectedNft.value = false;
-  packageModalOpen.value = true;
-};
-const upgradeNftModal = async (selectedNft) => {
-  upgradeNft.value = `${selectedNft.title} (Size: ${selectedNft.metadata.attributes[1].value}, Usage ${selectedNft.metadata.attributes[0].value}%)`;
-  mainSelectedNft.value = selectedNft;
-  let selectedPackageSize = selectedNft.metadata.attributes[1].value.replace(/\D/g, '');
-
-  if(selectedNft.metadata.attributes[1].value.includes('MB')){
-    selectedPackageSize = 0;
-  }
-  pxNftPackages.value.forEach(item => {
-    if(item.size <= selectedPackageSize){
-      item.disabled = true;
-    }
-  });
-  packageModalOpen.value = true;
-};
-
-const mintNft = async (nftPackage) => {
-  pxNftPackages.value.forEach(item => {
-    item.processing = false;
-    item.disabled = true;
-  });
-  nftPackage.processing = true;
-  toast.info("Minting in progress")
-  const res = await mintPxNft(nftPackage.id, nftPackage.price).catch((error) => toast.error(error.message));
-  if (!res?.error) {
-    toast.success("Minted")
-    closeModal();
-    await connectStorageNft();
-  }
-  else{
-    toast.error(res.error.message)
-  }
-};
-const upgradeMintNft = async (nftPackage) => {
-  pxNftPackages.value.forEach(item => {
-    item.processing = false;
-    item.disabled = true;
-  });
-  nftPackage.processing = true;
-  toast.info("Upgrading PX sNFT in progress")
-  const res = await upgradePxNftPackage(mainSelectedNft.value.id.tokenId, nftPackage.id, nftPackage.price).catch((error) => toast.error(error.message));
-  if (!res?.error) {
-    toast.success("Upgraded")
-    closeModal();
-    await connectStorageNft();
-  }
-  else{
-    toast.error(res.error.message)
-  }
-
-};
-const connectStorageNft = async () => {
-  pxXNfts.value = await getNfts().catch((error) => toast.error(error.message));
-  if (!pxXNfts.value?.error) {
-    pxXNfts.value.nfts[0].isDefault = true;
-    initializeMailClient(pxXNfts.value.nfts[0].endpoint,pxXNfts.value.nfts[0].jwt)
-  }
-  else{
-    toast.error(pxXNfts.value.error)
-  }
-};
-const setDefault = async (nft) => {
-  pxXNfts.value.nfts.forEach(item => {
-    item.isDefault = false;
-  });
-  nft.isDefault = true;
-  initializeMailClient(nft.endpoint, nft.jwt)
+const openNftPackagesModal = (nftForUpgrade?: Nft) => {
+  selectedNftForUpgrade.value = nftForUpgrade;
+  nftPackagesModalOpen.value = true;
 };
 
 const closeModal = () => {
-  packageModalOpen.value = false;
-  pxNftPackages.value.forEach(item => {
-    item.processing = false;
-    item.disabled = false;
+  nftPackagesModalOpen.value = false;
+};
+
+const handleNftPackageClick = (nftPackage: NftPackage) => {
+  if (isNftPackageDisabled.value(nftPackage)) {
+    return;
+  }
+
+  processingNftPackageIds.value.add(nftPackage.id);
+
+  const action = selectedNftForUpgrade.value
+    ? upgradeNft(selectedNftForUpgrade.value, nftPackage)
+    : mintNft(nftPackage);
+
+  action.then(() => {
+    processingNftPackageIds.value.delete(nftPackage.id);
+    closeModal();
   });
 };
 
-const pollinationxWidget = computed(() => {
-  if(pxXNfts.value?.success && pxXNfts.value.nfts?.length == 0){
-
-    return {
-      title: 'PollinationX Storage On-Demand',
-      text: 'Connected',
-      button: {
-        text: 'Mint your FREE 100MB PX sNFT',
-        mintFree: true,
-        click: () => mintFreeNft(),
-      },
-    };
+const isNftPackageDisabled = computed(() => (nftPackage: NftPackage) => {
+  // Disable all packages if any package being processed
+  if (processingNftPackageIds.value.size) {
+    return true;
   }
-  else if(!pxXNfts.value?.success){
+
+  // We don't disable nft packages if we are buying a new nft
+  if (!selectedNftForUpgrade.value) {
+    return false;
+  }
+
+  // If we have a selected nft for upgrade, we can't downgrade it
+  let selectedNftSize = selectedNftForUpgrade.value.metadata.attributes[1].value.replace(/\D/g, '');
+
+  if (selectedNftForUpgrade.value.metadata.attributes[1].value.includes('MB')) {
+    selectedNftSize = 0;
+  }
+
+  return nftPackage.size <= selectedNftSize;
+});
+
+const pollinationXWidget = computed(() => {
+  if (!pxNfts.value.success) {
     return {
       title: 'PollinationX Storage On-Demand',
       text: '',
       button: {
-        mintFree: false,
         text: 'Connect PX sNFTs',
         click: () => connectStorageNft(),
       },
     };
   }
-  else{
+  if (!pxNfts.value.nfts?.length) {
     return {
       title: 'PollinationX Storage On-Demand',
       text: 'Connected',
       button: {
-        mintFree: false,
-        text: 'Buy new PX sNFT',
-        click: () => mintNftModal(),
+        text: 'Mint your FREE 100MB PX sNFT',
+        click: () => mintNft(),
       },
     };
   }
+
+  return {
+    title: 'PollinationX Storage On-Demand',
+    text: 'Connected',
+    button: {
+      text: 'Buy new PX sNFT',
+      click: () => openNftPackagesModal(),
+    },
+  };
 });
 
-const pollinationxModalInfo = computed(() => {
-
-  if(upgradeNft.value){
-    return {
-      title: 'Upgrade existing PX sNFT',
-      upgrade: true
-    };
-  }
- else{
-    return {
-      title: 'Mint new PX sNFT',
-      upgrade: false
-    };
-  }
-
-});
+const pollinationXModalInfo = computed(() => ({
+  title: selectedNftForUpgrade.value ? 'Upgrade existing PX sNFT' : 'Mint new PX sNFT',
+}));
 </script>
 
 <template>
@@ -178,8 +112,8 @@ const pollinationxModalInfo = computed(() => {
         <div class="relative">
           <img
             class="relative z-10 mx-auto max-w-[100px]"
-            src="/img/logos/pxIcon.svg"
-            :alt="pollinationxWidget.title"
+            src="/img/logos/pollination-x-icon.svg"
+            :alt="pollinationXWidget.title"
           />
           <div
             class="absolute start-1/2 top-1/2 h-20 w-20 -translate-x-1/2 -translate-y-1/2 rounded-full bg-primary-500/10 transition-transform duration-300 group-hover:scale-150"
@@ -188,147 +122,97 @@ const pollinationxModalInfo = computed(() => {
       </div>
       <div class="text-center">
         <BaseHeading as="h3" size="md" weight="medium" lead="tight" class="mb-1 text-muted-800 dark:text-white">
-          <span>{{ pollinationxWidget.title }}</span>
+          <span>{{ pollinationXWidget.title }}</span>
         </BaseHeading>
         <BaseParagraph size="xs">
-          <span class="text-muted-400">{{ pollinationxWidget.text }}</span>
+          <span class="text-muted-400">{{ pollinationXWidget.text }}</span>
         </BaseParagraph>
       </div>
-      <div v-if="pollinationxWidget.button" class="mt-4 text-center">
+      <div v-if="pollinationXWidget.button" class="mt-4 text-center">
         <BaseButton
           target="_blank"
           class="w-full max-w-sm"
           color="primary"
-          @click.passive="pollinationxWidget.button.click"
+          @click.passive="pollinationXWidget.button.click"
         >
           <Icon name="ph:cursor-click" class="h-5 w-5" />
-          <span>{{ pollinationxWidget.button.text }}</span>
+          <span>{{ pollinationXWidget.button.text }}</span>
         </BaseButton>
       </div>
-      <div v-if="pxXNfts && pxXNfts.nfts" class="mt-4 text-center">
-        <BaseParagraph size="xs" v-if="pxXNfts.nfts.length > 0">
+      <div v-if="pxNfts.nfts?.length" class="mt-4 text-center">
+        <BaseParagraph size="xs">
           <span class="text-muted-400">Click to select default PX sNFT ↓</span>
         </BaseParagraph>
-        <ul class="nft-list mt-2">
+        <ul class="mt-2">
           <li
-            v-for="nft in pxXNfts.nfts"
-            :key="nft.id"
-            @click="setDefault(nft)"
-            :class="{ 'default-selection': nft.isDefault }"
+            v-for="(nft, index) in pxNfts.nfts"
+            :key="index"
+            :class="{ 'bg-muted-100/80 dark:bg-muted-700/60': nft === primaryNft }"
+            @click="setPrimaryNft(nft)"
           >
-            <div class="nft-item">
-              <img width="15" src="/img/logos/pxIcon.svg" :alt="pollinationxWidget.title" class="nft-favicon mr-2" />
-              <img width="15" src="/img/edit.png" :alt="pollinationxWidget.title" class="nft-edit-icon mr-2" @click="upgradeNftModal(nft)" />
+            <div class="flex cursor-pointer p-2 hover:bg-muted-100/80 dark:hover:bg-muted-700/60">
+              <img src="/img/logos/pollination-x-icon.svg" :alt="pollinationXWidget.title" class="mr-2 h-5 w-5" />
+              <Icon
+                name="ph:note-pencil"
+                class="mr-2 h-5 w-5 text-muted-500 hover:text-muted-600 dark:text-muted-400/80 dark:hover:text-muted-200"
+                @click="openNftPackagesModal(nft)"
+              />
               <BaseParagraph size="xs">
-                {{ nft.title }} (Size: {{ nft.metadata.attributes[1].value }}, Usage {{ nft.metadata.attributes[0].value }}%)
+                {{ nft.title }} (Size: {{ nft.metadata.attributes[1].value }}, Usage
+                {{ nft.metadata.attributes[0].value }}%)
               </BaseParagraph>
+              <Icon
+                v-if="nft === primaryNft"
+                name="feather:check"
+                class="ml-auto h-5 w-5 text-success-500 dark:text-success-400"
+              />
             </div>
           </li>
         </ul>
       </div>
-      <div v-else>
-        <div v-if="pollinationxWidget.button && pollinationxWidget.button.mintFree" class="mt-4 text-center">
-          <BaseButton
-            target="_blank"
-            class="w-full max-w-sm"
-            color="primary"
-            @click.passive="pollinationxWidget.button.click"
-          >
-            <Icon name="ph:cursor-click" class="h-5 w-5" />
-            <span>{{ pollinationxWidget.button.text }}</span>
-          </BaseButton>
-        </div>
-      </div>
     </div>
   </BaseCard>
-  <ModalDialog v-if="packageModalOpen" :open="packageModalOpen" size="sm" @close="closeModal">
-      <div class="flex w-full items-center justify-between p-4 md:p-6">
-        <h3 class="font-heading text-lg font-medium leading-6 text-muted-900 dark:text-white">{{ pollinationxModalInfo.title }}</h3>
-        <BaseButtonClose @click="closeModal" />
-      </div>
-      <BaseParagraph v-if="pollinationxModalInfo.upgrade" size="xs" class="text-center">
-        <span class="text-muted-400">
-          Upgrading: {{ upgradeNft }}
-        </span>
-      </BaseParagraph>
-    <div class="package-wrapper">
-      <div v-for="nftPackage in pxNftPackages" :key="nftPackage.id" class="package-container">
-        <div v-if="pollinationxModalInfo.upgrade" :class="{ 'disabled': nftPackage.disabled }"  @click="!nftPackage.disabled && upgradeMintNft(nftPackage)">
-          <img width="25" src="/img/logos/pxIcon.svg" :class="{ 'logoPackages': nftPackage.processing, 'mx-auto': true, 'mb-2': true }"/>
-          <div class="package-details">
-            <p class="text-sm">Size: {{ nftPackage.size }} GB</p>
-            <p class="text-sm">Price: {{ nftPackage.price }} {{ pxXNfts.symbol }}</p>
-          </div>
-        </div>
-        <div v-else :class="{ 'disabled': nftPackage.disabled }"  @click="!nftPackage.disabled && mintNft(nftPackage)">
-          <img width="25" src="/img/logos/pxIcon.svg" :class="{ 'logoPackages': nftPackage.processing, 'mx-auto': true, 'mb-2': true }"/>
-          <div class="package-details">
-            <p class="text-sm">Size: {{ nftPackage.size }} GB</p>
-            <p class="text-sm">Price: {{ nftPackage.price }} {{ pxXNfts.symbol }}</p>
+  <ModalDialog v-if="nftPackagesModalOpen" :open="nftPackagesModalOpen" size="sm" @close="closeModal">
+    <div class="flex w-full items-center justify-between p-4 md:p-6">
+      <h3 class="font-heading text-lg font-medium leading-6 text-muted-900 dark:text-white">
+        {{ pollinationXModalInfo.title }}
+      </h3>
+      <BaseButtonClose @click="closeModal" />
+    </div>
+    <BaseParagraph v-if="selectedNftForUpgrade" size="xs" class="pb-4 text-center">
+      <span class="text-muted-400">
+        Upgrading:
+        {{
+          `${selectedNftForUpgrade.title}
+          (Size: ${selectedNftForUpgrade.metadata.attributes[1].value},
+          Usage ${selectedNftForUpgrade.metadata.attributes[0].value}%)`
+        }}
+      </span>
+    </BaseParagraph>
+    <div class="grid grid-cols-2 gap-2 p-4 pt-0">
+      <div
+        v-for="nftPackage in pxNftPackages"
+        :key="nftPackage.id"
+        class="cursor-pointer rounded-xl border border-muted-200 p-4 text-center hover:bg-muted-100 dark:border-muted-700 hover:dark:bg-muted-900"
+      >
+        <div
+          :class="{
+            'cursor-not-allowed opacity-30': isNftPackageDisabled(nftPackage),
+          }"
+          @click="handleNftPackageClick(nftPackage)"
+        >
+          <img
+            src="/img/logos/pollination-x-icon.svg"
+            :class="{ 'animate-spin': processingNftPackageIds.has(nftPackage.id) }"
+            class="mx-auto mb-2 h-8 w-8"
+            alt="PollinationX icon"
+          />
+          <div>
+            <span class="block text-sm">Size: {{ nftPackage.size }} GB</span>
+            <span class="block text-sm">Price: {{ nftPackage.price }} {{ pxNfts.symbol }}</span>
           </div>
         </div>
       </div>
     </div>
   </ModalDialog>
 </template>
-
-<style scoped>
-.nft-list {
-  list-style-type: none;
-  padding: 0;
-}
-.nft-item {
-  display: flex;
-  padding: 8px;
-  cursor: pointer;
-}
-.default-selection {
-  position: relative;
-  background-color: rgba(34, 51, 81, 0.6);
-}
-.default-selection:before {
- content: '✓';
-  color: green;
-  margin-left: 5px;
-  position: absolute;
-  right: 10px;
-  bottom: 3px;
-  font-size: 20px;
-}
-.nft-item:hover {
-  background-color: rgba(34, 51, 81, 0.6);
-}
-.package-wrapper{
-  display: flex;
-  flex-wrap: wrap;
-}
-.package-container {
-  flex: 40%;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  padding: 16px;
-  text-align: center;
-  box-sizing: border-box;
-  margin:10px;
-  cursor: pointer;
-}
-.package-container:hover{
-  background-color: rgba(34, 51, 81, 0.6);
-}
-.logoPackages {
-  animation: rotate 2s linear infinite;
-}
-
-@keyframes rotate {
-  from {
-    transform: rotateY(0deg);
-  }
-  to {
-    transform: rotateY(360deg);
-  }
-}
-.package-container .disabled{
-  opacity: 0.3;
-}
-
-</style>
