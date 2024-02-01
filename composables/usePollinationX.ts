@@ -19,9 +19,9 @@ export function usePollinationX() {
       'This request will check your PollinationX storage NFT and it will not trigger a blockchain transaction or cost any gas fees.',
   };
 
-  const pollinationXClient = useState<PollinationX>('pollination-x-client');
-  const pxNfts = useState<GetNft>('px-nfts');
-  const primaryNft = useState<Nft>('primary-nft');
+  const pollinationXClient = useState<PollinationX | undefined>('pollination-x-client');
+  const pxNfts = useState<GetNft | undefined>('px-nfts');
+  const primaryNft = useState<Nft | undefined>('primary-nft');
   const pxNftPackages = useState<NftPackage[]>('nft-packages', () => [
     { id: 1, size: 5, price: '0.005' },
     { id: 2, size: 10, price: '0.01' },
@@ -35,16 +35,15 @@ export function usePollinationX() {
     const endpoint = isNftIntegrationEnabled ? primaryNft.value?.endpoint : runtimeConfig.public.pollinationX.url;
     const token = isNftIntegrationEnabled ? primaryNft.value?.jwt : runtimeConfig.public.pollinationX.token;
 
-    pollinationXClient.value = new PollinationX(endpoint, token);
+    if (endpoint && token) {
+      pollinationXClient.value = new PollinationX(endpoint, token);
+    }
   };
 
   const disconnectPollinationX = () => {
-    pxNfts.value = {
-      nfts: [],
-      success: false,
-      contractAddress: '',
-      symbol: '',
-    };
+    clearNuxtState(['pollination-x-client', 'px-nfts', 'primary-nft']);
+    pxNfts.value = undefined;
+    primaryNft.value = undefined;
   };
 
   const setPrimaryNft = (nft: Nft) => {
@@ -76,9 +75,9 @@ export function usePollinationX() {
   const connectStorageNft = async () => {
     pxNfts.value = await fetchUserNfts().catch((error) => toast.error(error.message));
 
-    if (pxNfts.value.error) {
+    if (pxNfts.value?.error) {
       toast.error(pxNfts.value.error);
-    } else if (pxNfts.value.nfts?.length) {
+    } else if (pxNfts.value?.nfts?.length) {
       setPrimaryNft(pxNfts.value.nfts[0]);
     }
   };
@@ -130,11 +129,11 @@ export function usePollinationX() {
 
     const hash = await walletClient.sendTransaction({
       data: encodedData,
-      to: pxNfts.value.contractAddress as Address,
+      to: pxNfts.value?.contractAddress as Address,
       value,
     });
 
-    return await usePublicClient().value.waitForTransactionReceipt({ hash });
+    return usePublicClient().value.waitForTransactionReceipt({ hash });
   };
 
   return {

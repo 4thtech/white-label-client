@@ -6,6 +6,8 @@ const props = defineProps<{
   receivedEnvelopes: ReceivedEnvelope[];
 }>();
 
+const { isNftIntegrationEnabled, primaryNft } = usePollinationX();
+
 const selectedEnvelope = useState<ReceivedEnvelope | undefined>('selected-envelope');
 const isPanelActive = useState<boolean>('is-panel-active', () => false);
 
@@ -26,12 +28,18 @@ const selectEnvelope = (envelope: ReceivedEnvelope) => {
   selectedEnvelope.value = envelope;
   isPanelActive.value = true;
 };
+
+const isPollinationXWidgetVisible = computed(() => isNftIntegrationEnabled && !primaryNft.value);
 </script>
 
 <template>
   <div class="flex h-full w-full flex-col bg-muted-50 pt-3 dark:bg-muted-900 lg:w-full ltablet:w-full">
+    <!-- PollinationX widget -->
+    <div v-if="isPollinationXWidgetVisible" class="my-auto">
+      <PollinationxWidget v-if="isPollinationXWidgetVisible" color="none" />
+    </div>
     <!-- Show mails if any -->
-    <div v-if="receivedEnvelopes.length" class="overflow-y-auto">
+    <div v-else-if="receivedEnvelopes.length" class="overflow-y-auto">
       <!-- Head (search) -->
       <div class="h-16 w-full px-4 sm:px-8">
         <BaseInput

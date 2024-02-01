@@ -15,7 +15,7 @@ const emits = defineEmits<{
 }>();
 
 const { encryptorClient, isReadyToUse: isEncryptorReadyToUse } = useEncryptor();
-const { isNftIntegrationEnabled, pxNfts } = usePollinationX();
+const { isNftIntegrationEnabled, primaryNft } = usePollinationX();
 const { mailClient } = useMail();
 const route = useRoute();
 const toast = useToast();
@@ -117,9 +117,7 @@ const prepareContent = (action: 'reply' | 'forward', envelope: ReceivedEnvelope)
 };
 
 const isEncryptorWidgetVisible = computed(() => canUseEncryption.value && !isEncryptorReadyToUse.value);
-const isPollinationXWidgetVisible = computed(
-  () => isNftIntegrationEnabled && !pxNfts.value.success && !pxNfts.value?.nfts?.length,
-);
+const isPollinationXWidgetVisible = computed(() => isNftIntegrationEnabled && !primaryNft.value);
 
 onMounted(() => {
   const queryType = route.query.reply ? 'reply' : route.query.forward ? 'forward' : undefined;

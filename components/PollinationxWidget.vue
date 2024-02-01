@@ -69,7 +69,7 @@ const isNftPackageDisabled = computed(() => (nftPackage: NftPackage) => {
 });
 
 const pollinationXWidget = computed(() => {
-  if (!pxNfts.value.success) {
+  if (!pxNfts.value?.success) {
     return {
       title: 'PollinationX Storage On-Demand',
       text: '',
@@ -79,7 +79,7 @@ const pollinationXWidget = computed(() => {
       },
     };
   }
-  if (!pxNfts.value.nfts?.length) {
+  if (!pxNfts.value?.nfts?.length) {
     return {
       title: 'PollinationX Storage On-Demand',
       text: 'Connected',
@@ -139,7 +139,7 @@ const pollinationXModalInfo = computed(() => ({
           <span>{{ pollinationXWidget.button.text }}</span>
         </BaseButton>
       </div>
-      <div v-if="pxNfts.nfts?.length" class="mt-4 text-center">
+      <div v-if="pxNfts?.nfts?.length" class="mt-4 text-center">
         <BaseParagraph size="xs">
           <span class="text-muted-400">Click to select default PX sNFT ↓</span>
         </BaseParagraph>
@@ -209,7 +209,7 @@ const pollinationXModalInfo = computed(() => ({
           />
           <div>
             <span class="block text-sm">Size: {{ nftPackage.size }} GB</span>
-            <span class="block text-sm">Price: {{ nftPackage.price }} {{ pxNfts.symbol }}</span>
+            <span class="block text-sm">Price: {{ nftPackage.price }} {{ pxNfts?.symbol }}</span>
           </div>
         </div>
       </div>
