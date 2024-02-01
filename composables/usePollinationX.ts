@@ -1,6 +1,5 @@
-import { type Address } from 'viem';
-import { parseEther, toHex } from 'viem';
-import { prepareWriteContract, waitForTransaction, writeContract } from '@wagmi/core';
+import type { Address } from 'viem';
+import { encodeFunctionData, parseEther, toHex } from 'viem';
 import { useToast } from 'vue-toastification';
 import { PollinationX } from '@4thtech-sdk/storage';
 import pollinationXAbi from '~/assets/abi/pollination-x.json';
@@ -9,6 +8,7 @@ import type { GetNft, Nft, NftPackage, PollinationXConfig } from '~/types/pollin
 export function usePollinationX() {
   const { address } = useAccount();
   const chainId = useChainId();
+  const { walletClient } = useWallet();
   const runtimeConfig = useRuntimeConfig();
   const { signMessageAsync } = useSignMessage();
   const toast = useToast();
@@ -91,9 +91,9 @@ export function usePollinationX() {
     const nftPackagePrice = isFreeMint ? 0n : parseEther(nftPackage.price);
 
     try {
-      const res = await doWriteContract('mint', [nftPackageId], nftPackagePrice);
+      const txReceipt = await sendTransaction('mint', [nftPackageId], nftPackagePrice);
 
-      if (res.status === 'success') {
+      if (txReceipt.status === 'success') {
         toast.success('Minted');
         await connectStorageNft();
       }
@@ -106,13 +106,13 @@ export function usePollinationX() {
     toast.info('Upgrading PX sNFT in progress');
 
     try {
-      const res = await doWriteContract(
+      const txReceipt = await sendTransaction(
         'upgradeTokenPackage',
         [parseInt(selectedNftForUpgrade.id.tokenId), nftPackage.id],
         parseEther(nftPackage.price),
       );
 
-      if (res.status === 'success') {
+      if (txReceipt.status === 'success') {
         toast.success('Minted');
         await connectStorageNft();
       }
@@ -121,21 +121,20 @@ export function usePollinationX() {
     }
   };
 
-  const doWriteContract = async (functionName: string, args: any[], value: bigint = 0n) => {
-    const config = await prepareWriteContract({
-      address: pxNfts.value.contractAddress as Address,
+  const sendTransaction = async (functionName: string, args: any[], value: bigint = 0n) => {
+    const encodedData = encodeFunctionData({
       abi: pollinationXAbi,
       functionName,
-      args: [...args],
+      args,
+    });
+
+    const hash = await walletClient.sendTransaction({
+      data: encodedData,
+      to: pxNfts.value.contractAddress as Address,
       value,
     });
 
-    const { hash } = await writeContract(config);
-
-    return waitForTransaction({
-      confirmations: 1,
-      hash,
-    });
+    return await usePublicClient().value.waitForTransactionReceipt({ hash });
   };
 
   return {
