@@ -34,7 +34,7 @@ export function useEncryptor() {
     }
 
     encryptorExtension.value = new EncryptorExtensionConnector();
-    encryptorClient.value = new Encryptor({ encryptorExtension, walletClient });
+    encryptorClient.value = new Encryptor({ encryptorExtension: encryptorExtension.value, walletClient });
     userClient.value = new User({ walletClient });
 
     fetchAndUpdateEncryptorInfo(true).then(() => {

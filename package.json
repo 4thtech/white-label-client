@@ -34,7 +34,7 @@
   "dependencies": {
     "@4thtech-sdk/encryption": "^0.2.2",
     "@4thtech-sdk/encryptor": "^0.2.3",
-    "@4thtech-sdk/ethereum": "^0.3.4",
+    "@4thtech-sdk/ethereum": "^0.3.5",
     "@4thtech-sdk/storage": "^0.3.2",
     "@4thtech-sdk/types": "^0.3.2",
     "@4thtech-sdk/utils": "^0.0.1",

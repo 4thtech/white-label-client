@@ -7,6 +7,7 @@ import {
   oasisSapphireTestnet,
   polygonMumbai,
   sepolia,
+  zetachainAthensTestnet,
 } from '@4thtech-sdk/ethereum';
 
 import { CoinbaseWalletConnector } from 'use-wagmi/connectors/coinbaseWallet';
@@ -17,7 +18,16 @@ import { publicProvider } from 'use-wagmi/providers/public';
 
 export default defineNuxtPlugin((nuxtApp) => {
   const { chains, publicClient, webSocketPublicClient } = configureChains(
-    [sepolia, polygonMumbai, edgewareTestnet, artheraTestnet, metisGoerli, oasisSapphireTestnet, immu3Testnet],
+    [
+      sepolia,
+      polygonMumbai,
+      edgewareTestnet,
+      artheraTestnet,
+      metisGoerli,
+      oasisSapphireTestnet,
+      immu3Testnet,
+      zetachainAthensTestnet,
+    ],
     [publicProvider()],
   );
 
