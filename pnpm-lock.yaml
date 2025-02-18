@@ -15,8 +15,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       '@4thtech-sdk/ethereum':
-        specifier: ^0.5.10
-        version: 0.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.5.11
+        version: 0.5.11(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@4thtech-sdk/storage':
         specifier: ^0.3.5
         version: 0.3.5
@@ -135,8 +135,8 @@ packages:
   '@4thtech-sdk/encryptor@0.3.1':
     resolution: {integrity: sha512-81H3oEqTDtbstvaD9NiU/0VdbeSHUmF5ANPfY3ie2nj/d+ikhLIJKleH49o/Lg1YVuw4165+WIZjWShTrN72nw==}
 
-  '@4thtech-sdk/ethereum@0.5.10':
-    resolution: {integrity: sha512-Klvnr7PaTfQDy7lkfxAFwimY64onqJ7zu1BXtEzu66zjtFW8LDwpQ7ZWIbBUWhWKGzLAff6ZodiuU+oGZ34yZQ==}
+  '@4thtech-sdk/ethereum@0.5.11':
+    resolution: {integrity: sha512-4nOWlpsE5lzlujWltx3ucPk9RE4Dh+gV6eWwYmNm6sLAkglJ+eui+LYH9w5O1E/SXX8fuGUoZ9Qjq+EWz2cRRg==}
 
   '@4thtech-sdk/storage@0.3.5':
     resolution: {integrity: sha512-oLlLnnLePoXMRVd6WEvjLSIuurbKZsEBspGYaoaEzkOj2xwuWciayvH5ris1pwBMo8qMMIetxkp7kdNP49OgDA==}
@@ -6335,7 +6335,7 @@ snapshots:
 
   '@4thtech-sdk/encryptor@0.3.1': {}
 
-  '@4thtech-sdk/ethereum@0.5.10(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@4thtech-sdk/ethereum@0.5.11(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
