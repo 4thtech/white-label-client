@@ -2,6 +2,7 @@ import { UseWagmiPlugin, configureChains, createConfig } from 'use-wagmi';
 import {
   fantom,
   fantomTestnet,
+  gnosis,
   gnosisChiado,
   immu3Testnet,
   minato,
@@ -29,6 +30,7 @@ export default defineNuxtPlugin((nuxtApp) => {
       oasisSaphire,
       polygon,
       polygonAmoy,
+      gnosis,
       gnosisChiado,
       sonicTestnet,
       citrea,

@@ -15,8 +15,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       '@4thtech-sdk/ethereum':
-        specifier: ^0.5.11
-        version: 0.5.11(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.5.12
+        version: 0.5.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@4thtech-sdk/storage':
         specifier: ^0.3.5
         version: 0.3.5
@@ -135,8 +135,8 @@ packages:
   '@4thtech-sdk/encryptor@0.3.1':
     resolution: {integrity: sha512-81H3oEqTDtbstvaD9NiU/0VdbeSHUmF5ANPfY3ie2nj/d+ikhLIJKleH49o/Lg1YVuw4165+WIZjWShTrN72nw==}
 
-  '@4thtech-sdk/ethereum@0.5.11':
-    resolution: {integrity: sha512-4nOWlpsE5lzlujWltx3ucPk9RE4Dh+gV6eWwYmNm6sLAkglJ+eui+LYH9w5O1E/SXX8fuGUoZ9Qjq+EWz2cRRg==}
+  '@4thtech-sdk/ethereum@0.5.12':
+    resolution: {integrity: sha512-4gNpxWAJecIVPPt2zxjlR9xPevV16QJC6tuLrKHi5V47zGX2+KYSyLWbsgExlPFq1IOUrXCXMEkxKdir8+tXdA==}
 
   '@4thtech-sdk/storage@0.3.5':
     resolution: {integrity: sha512-oLlLnnLePoXMRVd6WEvjLSIuurbKZsEBspGYaoaEzkOj2xwuWciayvH5ris1pwBMo8qMMIetxkp7kdNP49OgDA==}
@@ -6102,17 +6102,6 @@ packages:
       '@vue/composition-api':
         optional: true
 
-  vue-demi@0.14.6:
-    resolution: {integrity: sha512-8QA7wrYSHKaYgUxDA5ZC24w+eHm3sYCbp0EzcDwKqN3p6HqtTCGR/GVsPyZW92unff4UlcSh++lmqDWN3ZIq4w==}
-    engines: {node: '>=12'}
-    hasBin: true
-    peerDependencies:
-      '@vue/composition-api': ^1.0.0-rc.1
-      vue: ^3.0.0-0 || ^2.6.0
-    peerDependenciesMeta:
-      '@vue/composition-api':
-        optional: true
-
   vue-devtools-stub@0.1.0:
     resolution: {integrity: sha512-RutnB7X8c5hjq39NceArgXg28WZtZpGc3+J16ljMiYnFhKvd8hITxSWQSQ5bvldxMDU6gG5mkxl1MTQLXckVSQ==}
 
@@ -6335,7 +6324,7 @@ snapshots:
 
   '@4thtech-sdk/encryptor@0.3.1': {}
 
-  '@4thtech-sdk/ethereum@0.5.11(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@4thtech-sdk/ethereum@0.5.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -8550,7 +8539,7 @@ snapshots:
       '@vueuse/metadata': 10.6.1
       local-pkg: 0.5.0
       nuxt: 3.13.2(@parcel/watcher@2.4.1)(@types/node@20.9.2)(bufferutil@4.0.8)(encoding@0.1.13)(eslint@8.57.1)(idb-keyval@6.2.1)(ioredis@5.4.1)(magicast@0.3.5)(optionator@0.9.3)(rollup@4.21.3)(terser@5.24.0)(typescript@5.2.2)(utf-8-validate@5.0.10)(vite@5.4.6(@types/node@20.9.2)(terser@5.24.0))(webpack-sources@3.2.3)
-      vue-demi: 0.14.6(vue@3.5.6(typescript@5.2.2))
+      vue-demi: 0.14.10(vue@3.5.6(typescript@5.2.2))
     transitivePeerDependencies:
       - '@vue/composition-api'
       - rollup
@@ -13666,10 +13655,6 @@ snapshots:
       vue: 3.5.6(typescript@5.2.2)
 
   vue-demi@0.14.10(vue@3.5.6(typescript@5.2.2)):
-    dependencies:
-      vue: 3.5.6(typescript@5.2.2)
-
-  vue-demi@0.14.6(vue@3.5.6(typescript@5.2.2)):
     dependencies:
       vue: 3.5.6(typescript@5.2.2)
 
