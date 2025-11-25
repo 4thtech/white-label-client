@@ -15,8 +15,8 @@ importers:
         specifier: ^0.3.1
         version: 0.3.1
       '@4thtech-sdk/ethereum':
-        specifier: ^0.5.12
-        version: 0.5.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)
+        specifier: ^0.5.13
+        version: 0.5.13(bufferutil@4.0.8)(utf-8-validate@5.0.10)
       '@4thtech-sdk/storage':
         specifier: ^0.3.5
         version: 0.3.5
@@ -135,8 +135,8 @@ packages:
   '@4thtech-sdk/encryptor@0.3.1':
     resolution: {integrity: sha512-81H3oEqTDtbstvaD9NiU/0VdbeSHUmF5ANPfY3ie2nj/d+ikhLIJKleH49o/Lg1YVuw4165+WIZjWShTrN72nw==}
 
-  '@4thtech-sdk/ethereum@0.5.12':
-    resolution: {integrity: sha512-4gNpxWAJecIVPPt2zxjlR9xPevV16QJC6tuLrKHi5V47zGX2+KYSyLWbsgExlPFq1IOUrXCXMEkxKdir8+tXdA==}
+  '@4thtech-sdk/ethereum@0.5.13':
+    resolution: {integrity: sha512-WHxITYMt4+q01qyh/9hbptYaiNomEpJlta2YcfJ+6nUOux4tgSFbX5O4lzINKh8OAAL/wvYNyx/K686bpOedwg==}
 
   '@4thtech-sdk/storage@0.3.5':
     resolution: {integrity: sha512-oLlLnnLePoXMRVd6WEvjLSIuurbKZsEBspGYaoaEzkOj2xwuWciayvH5ris1pwBMo8qMMIetxkp7kdNP49OgDA==}
@@ -1679,6 +1679,9 @@ packages:
 
   '@types/estree@1.0.5':
     resolution: {integrity: sha512-/kYRxGDLWzHOB7q+wtSUQlFrtcdUccpfy+X+9iMBpHK8QLLhx2wIPYuS5DYtR9Wa/YlZAbIovy7qVdB1Aq6Lyw==}
+
+  '@types/estree@1.0.8':
+    resolution: {integrity: sha512-dWHzHa2WqEXI/O1E9OjrocMTKJl2mSrEolh1Iomrv6U+JuNwaHXsXx9bLu5gG7BUWFIN0skIQJQ/L1rIex4X6w==}
 
   '@types/file-saver@2.0.7':
     resolution: {integrity: sha512-dNKVfHd/jk0SkR/exKGj2ggkB45MAkzvWCaqLUUgkyjITkGNzH8H+yUwr+BLJUBjZOe9w8X3wgmXhZDRg1ED6A==}
@@ -6324,7 +6327,7 @@ snapshots:
 
   '@4thtech-sdk/encryptor@0.3.1': {}
 
-  '@4thtech-sdk/ethereum@0.5.12(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
+  '@4thtech-sdk/ethereum@0.5.13(bufferutil@4.0.8)(utf-8-validate@5.0.10)':
     dependencies:
       ethers: 6.13.2(bufferutil@4.0.8)(utf-8-validate@5.0.10)
     transitivePeerDependencies:
@@ -8129,11 +8132,14 @@ snapshots:
 
   '@types/eslint@8.44.7':
     dependencies:
-      '@types/estree': 1.0.5
+      '@types/estree': 1.0.8
       '@types/json-schema': 7.0.15
     optional: true
 
   '@types/estree@1.0.5': {}
+
+  '@types/estree@1.0.8':
+    optional: true
 
   '@types/file-saver@2.0.7': {}
 
